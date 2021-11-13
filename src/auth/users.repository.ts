@@ -8,6 +8,15 @@ import * as bcrypt from 'bcrypt';
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
 
+    async validateUserPassword(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+        const { email, password } = authCredentialsDto;
+        const user = await this.findOne({ email });
+        if (user && (await bcrypt.compare(password, user.password))) {
+            return user.email;
+        }
+        return null;
+    }
+
 
     async createUser(authCredentialsDto: AuthCredentialsDto) {
         const { email, password } = authCredentialsDto;
